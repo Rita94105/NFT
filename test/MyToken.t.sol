@@ -9,7 +9,8 @@ contract MyTokenTest is Test{
     address user = makeAddr("user");
 
     function setUp() public {
-        token = new MyToken(user);
+        vm.prank(user);
+        token = new MyToken();
     }
 
     function testMint() public{
@@ -22,14 +23,13 @@ contract MyTokenTest is Test{
         token.safeMint(user);
 
         string memory closed = token.tokenURI(0);
-        console.logString(closed);
+        assertEq(closed,"https://ipfs.io/ipfs/QmXeqeiCJNdnpZsvLLbh3PaPs5nSEpcP2xkhqcrDQhEioQ","default route error");
 
         token.flipReveal();
 
         string memory opened = token.tokenURI(0);
-        console.logString(opened);
-
-        assertEq(opened,closed,"open success");
+        assertEq(opened,"https://ipfs.io/ipfs/Qmd9nGXxxbQEDtypHDKGfFsBPZ6CdW9GeVJhfWjHGrUnGm","unblind fail");
+        
         vm.stopPrank();
     }
 }

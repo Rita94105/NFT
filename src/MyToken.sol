@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MyToken is ERC721, ERC721URIStorage, Ownable{
+contract MyToken is ERC721, ERC721URIStorage{
     uint256 private number;
+    address owner;
 
     // Constants
     uint256 public constant MAX_SUPPLY = 500;
@@ -23,13 +24,19 @@ contract MyToken is ERC721, ERC721URIStorage, Ownable{
 
     mapping(uint256 => string) private _tokenURIs;
 
-    constructor(address initialOwner)
+    constructor()
         ERC721("MyToken", "MTK")
-        Ownable(initialOwner)
     {
+        owner = msg.sender;
         setBaseURI("https://ipfs.io/ipfs/Qmd9nGXxxbQEDtypHDKGfFsBPZ6CdW9GeVJhfWjHGrUnGm");
         setNotRevealedURI("https://ipfs.io/ipfs/QmXeqeiCJNdnpZsvLLbh3PaPs5nSEpcP2xkhqcrDQhEioQ");
     }
+
+    modifier onlyOwner(){
+          require(owner==msg.sender,"Only owner can call this function");
+          _;
+    }
+
 
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
