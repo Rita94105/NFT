@@ -10,5 +10,5 @@ forge test --match-contract MyToken
 
 ```
 forge install openzeppelin/openzeppelin-contracts --no-commit
-forge install smartcontractkit/chainlink --no-commit;
+forge install smartcontractkit/chainlink --no-commit
 ```
