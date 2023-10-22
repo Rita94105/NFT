@@ -10,9 +10,6 @@ contract ReceiverTest is Test{
     NFTReceiver public rec;
     address user = makeAddr("user");
 
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-
     function setUp() public {
         nouse = new NotUseful(user);
         hw = new HW_Token();
