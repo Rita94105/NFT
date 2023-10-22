@@ -4,10 +4,8 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
-import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 
-contract MyToken is ERC721, ERC721URIStorage, Ownable,VRFConsumerBaseV2 {
+contract MyToken is ERC721, ERC721URIStorage, Ownable{
     uint256 private number;
 
     // Constants
@@ -25,24 +23,10 @@ contract MyToken is ERC721, ERC721URIStorage, Ownable,VRFConsumerBaseV2 {
 
     mapping(uint256 => string) private _tokenURIs;
 
-    // chainlink variables
-    VRFCoordinatorV2Interface immutable COORDINATOR;
-    address vrfCoordinator = 0x8103B0A8A00be2DDC778e6e7eaa21791Cd364625;
-    uint64 immutable s_subscriptionId =6268;
-    bytes32 immutable keyHash = 0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c;
-    uint32 constant callbackGasLimit = 100000;
-    uint16 constant requestConfirmations = 3;
-    uint32 constant numWords = 1;
-
-    uint256[] public s_randomWords;
-    uint256 public s_requestId;
-
     constructor(address initialOwner)
         ERC721("MyToken", "MTK")
         Ownable(initialOwner)
-        VRFConsumerBaseV2(vrfCoordinator)
     {
-        COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
         setBaseURI("https://ipfs.io/ipfs/Qmd9nGXxxbQEDtypHDKGfFsBPZ6CdW9GeVJhfWjHGrUnGm");
         setNotRevealedURI("https://ipfs.io/ipfs/QmXeqeiCJNdnpZsvLLbh3PaPs5nSEpcP2xkhqcrDQhEioQ");
     }
@@ -54,9 +38,8 @@ contract MyToken is ERC721, ERC721URIStorage, Ownable,VRFConsumerBaseV2 {
     function safeMint(address to) public {
         require(number<MAX_SUPPLY,"sold out");
         require(_isSaleActive, "Sale must be active to mint");
-
-        uint256 tokenId = (number +s_randomWords[0])%MAX_SUPPLY;
-        //uint256 tokenId = number;
+        
+        uint256 tokenId = number;
         _safeMint(to, tokenId);
         number ++;
     }
@@ -118,24 +101,6 @@ contract MyToken is ERC721, ERC721URIStorage, Ownable,VRFConsumerBaseV2 {
 
     function setMaxMint(uint256 _maxMint) public onlyOwner {
         maxMint = _maxMint;
-    }
-
-    function fulfillRandomWords(
-        uint256, 
-        uint256[] memory randomWords
-    ) internal override{
-        s_randomWords = randomWords;
-    }
-
-    function requestRandomWords() external onlyOwner {
-        // Will revert if subscription is not set and funded.
-        s_requestId = COORDINATOR.requestRandomWords(
-        keyHash,
-        s_subscriptionId,
-        requestConfirmations,
-        callbackGasLimit,
-        numWords
-        );
     }
 
 }
